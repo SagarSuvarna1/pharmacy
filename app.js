@@ -91,9 +91,11 @@ function ensureAuth(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
   next();
 }
-// ---- Homepage route ----
+
+// --- Login routes ---
+// Homepage route - handles 404 on base URL
 app.get('/', (req, res) => {
-  // If user is logged in, go to dashboard, else to login page
+  // If user is logged in, redirect to dashboard, else to login page
   if (req.session.user) {
     res.redirect('/dashboard');
   } else {
@@ -101,22 +103,43 @@ app.get('/', (req, res) => {
   }
 });
 
-// --- Login routes ---
-app.get('/login', (req, res) => res.render('login', { error: null }));
+// ---- Login routes ----
 
-// --- Login routes ---
-app.get('/login', (req, res) => res.render('login', { error: null }));
+// Show login page
+app.get('/login', (req, res) => {
+  res.render('login', { error: null });
+});
+
+// Handle login form submission
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
   db.get("SELECT * FROM users WHERE username = ?", [username], async (err, user) => {
-    if (err || !user) return res.render('login', { error: 'Invalid user!' });
+    if (err || !user) {
+      // Invalid user
+      return res.render('login', { error: 'Invalid user!' });
+    }
     const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) return res.render('login', { error: 'Invalid password!' });
-    req.session.user = { id: user.id, username: user.username, name: user.name, role: user.role };
+    if (!valid) {
+      // Incorrect password
+      return res.render('login', { error: 'Invalid password!' });
+    }
+    // Successful login
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      name: user.name,
+      role: user.role
+    };
     res.redirect('/dashboard');
   });
 });
-app.get('/logout', (req, res) => { req.session.destroy(() => res.redirect('/login')); });
+
+// Logout route
+app.get('/logout', (req, res) => {
+  req.session.destroy(() => {
+    res.redirect('/login');
+  });
+});
 
 
 // --- Dashboard ---
