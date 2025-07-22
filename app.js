@@ -21,11 +21,19 @@ app.use(bodyParser.urlencoded({ extended: true }));  // <--- Change false to tru
 app.use(bodyParser.json());
 
 // Sessions
+// Trust Proxy: Required for secure cookies to work on Render!
+app.set('trust proxy', 1);
+
 app.use(session({
   secret: 'pharmacy-secret',
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    sameSite: 'lax',
+    secure: true  // Set to true because Render uses HTTPS for your live URL
+  }
 }));
+
 
 // SQLite database connection
 const db = new sqlite3.Database('./pharmacy.db', (err) => {
