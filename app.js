@@ -91,6 +91,18 @@ function ensureAuth(req, res, next) {
   if (!req.session.user) return res.redirect('/login');
   next();
 }
+// ---- Homepage route ----
+app.get('/', (req, res) => {
+  // If user is logged in, go to dashboard, else to login page
+  if (req.session.user) {
+    res.redirect('/dashboard');
+  } else {
+    res.redirect('/login');
+  }
+});
+
+// --- Login routes ---
+app.get('/login', (req, res) => res.render('login', { error: null }));
 
 // --- Login routes ---
 app.get('/login', (req, res) => res.render('login', { error: null }));
