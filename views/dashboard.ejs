@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pharmacy Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #f4f7fa;
+      color: #333;
+    }
+
+    header {
+      background-color: #177489;
+      color: #fff;
+      padding: 20px 40px;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 5px;
+    }
+
+    header p {
+      font-size: 1rem;
+    }
+
+    main {
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #177489;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 25px;
+    }
+
+    .dashboard-tile {
+      background-color: #ffffff;
+      border-radius: 10px;
+      padding: 25px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #155f5a;
+    }
+
+    .dashboard-tile:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+      background-color: #e6f9f9;
+    }
+
+    .dashboard-tile span {
+      display: block;
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    footer {
+      background-color: #177489;
+      color: #fff;
+      text-align: center;
+      padding: 16px;
+      margin-top: 50px;
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+
+      .dashboard-tile {
+        font-size: 1rem;
+      }
+
+      .dashboard-tile span {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><%= pharmacy.name %> Pharmacy Dashboard</h1>
+    <p>Shop No. 25, Bannerghatta Road, Bangalore | Email: info@medicarepharmacy.in</p>
+  </header>
+
+  <main>
+    <div class="section-title">Quick Access</div>
+    <div class="dashboard-grid">
+      <a href="/billing" class="dashboard-tile">
+        <span>🧾</span>
+        Billing
+      </a>
+      <a href="/drugs" class="dashboard-tile">
+        <span>💊</span>
+        Drug Master
+      </a>
+      <a href="/stock" class="dashboard-tile">
+        <span>📦</span>
+        Opening Stock
+      </a>
+      <a href="/inventory" class="dashboard-tile">
+        <span>📋</span>
+        Inventory
+      </a>
+      <a href="/reports/sales" class="dashboard-tile">
+        <span>📊</span>
+        Sales Report
+      </a>
+      <a href="/reports/collection" class="dashboard-tile">
+        <span>💼</span>
+        User Collection
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    &copy; <%= new Date().getFullYear() %> <%= pharmacy.name %> | Powered by Medicare IT Solutions
+  </footer>
+</body>
+</html>

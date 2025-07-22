@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Pharmacy Bill Receipt</title>
+  <meta name="viewport" content="width=530, initial-scale=1">
+  <style>
+    :root {
+      --primary: #2288c8;
+      --accent: #27b8a0;
+      --danger: #e53e3e;
+      --header-bg: #eaf7fa;
+      --light-bg: #fff;
+      --border: #d6eef5;
+      --success: #139e5a;
+      --muted: #8ca2c2;
+    }
+    html, body {
+      width: 100vw;
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      background: var(--light-bg);
+      font-family: 'Segoe UI', 'Inter', Arial, sans-serif;
+      color: #293a52;
+      overflow-x: hidden;
+    }
+    .bill-main {
+      width: 100vw;
+      min-height: 100vh;
+      margin: 0;
+      padding: 16px 14px 18px 14px;
+      background: #fff;
+      box-sizing: border-box;
+      border-radius: 0;
+      box-shadow: none;
+    }
+    .pharmacy-head {
+      text-align: center;
+      margin-bottom: 6px;
+    }
+    .pharmacy-title {
+      font-size: 1.35em;
+      color: var(--primary);
+      font-weight: bold;
+      margin-bottom: 2px;
+      letter-spacing: 0.04em;
+    }
+    .pharmacy-address {
+      font-size: 1.06em;
+      color: #42608b;
+      margin-bottom: 4px;
+      font-weight: 500;
+    }
+    .pharmacy-license {
+      font-size: 1em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .bill-meta { font-size: 1.09em; margin-bottom: 8px;}
+    .bill-meta table { width: 100%; }
+    .bill-meta td { padding:2px 8px 2px 0;}
+    .line { border-bottom:1.5px solid var(--border); margin:10px 0 13px 0;}
+    .items { border-collapse:collapse; width:100%; font-size: 1em; margin-bottom:10px;}
+    .items th, .items td {
+      border:1px solid var(--border);
+      padding:7px 4px;
+      text-align:center;
+    }
+    .items th {
+      background: var(--header-bg);
+      color: #186da6;
+      font-weight:700;
+    }
+    .items td.left { text-align: left; }
+    .right { text-align:right !important; }
+    .bold { font-weight:600;}
+    .total-row {
+      font-size:1.18em;
+      background: #e1ffe6;
+      color: var(--success);
+      font-weight: 700;
+    }
+    .pay-block {
+      font-size:1.01em;
+      margin: 1.2em 0 .8em 0;
+      color:#197793;
+      border-radius:7px;
+      padding:9px 0 6px 0;
+      background:linear-gradient(90deg,#e3f7f3 85%,#eaeaf7 100%);
+    }
+    .pay-label { font-weight:600; color:#149e62;}
+    .pay-value { margin-left:2px; margin-right:12px;}
+    .pay-col { display:inline-block; min-width:95px; margin:2px 11px 2px 0;}
+    .barcode-box {text-align: center; margin: 13px 0 4px 0;}
+    .thank-banner {
+      text-align: center; margin-top: 19px;
+      font-size: 1.09rem; color: #118f49;
+      font-weight: 600;
+      padding: 7px 0 2px 0;
+    }
+    .no-print.print-buttons { text-align:center; margin-top:12px;}
+    .print-btn {
+      padding:7px 24px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1em;
+      cursor: pointer;
+      letter-spacing:0.02em;
+      margin-right: 14px;
+    }
+    .print-btn:hover { background: #187868; }
+    .no-print a {
+      color: #2374d9;
+      text-decoration: underline;
+      font-size: 1em;
+    }
+    .text-gray {color:#9eabc7;}
+    @media print {
+      @page {
+        size: A5;
+        /* Make sure margins are super thin for edge-to-edge print if printer supports it */
+        margin: 0mm 0mm 0mm 0mm;
+      }
+      html, body, .bill-main {
+        width: 100vw !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 0 0 0 !important;
+        box-sizing: border-box !important;
+        background: #fff !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bill-main">
+    <div class="pharmacy-head">
+      <span class="pharmacy-logo">
+        <!-- OPTIONAL: Swap SVG with <img src="/public/logo.png" style="max-width:65px;"> for your logo -->
+        <svg width="34" height="30" viewBox="0 0 40 35" fill="none">
+          <circle cx="20" cy="18" r="15" fill="#e7f6f2"/>
+          <rect x="11" y="8" width="18" height="8" rx="4" fill="#27b8a0"/>
+          <rect x="17.1" y="2.7" width="6" height="18.6" rx="3" transform="rotate(45 20 12)" fill="#71cbfa"/>
+        </svg>
+      </span><br>
+      <div class="pharmacy-title"><%= pharmacy?.name || 'My Pharmacy' %></div>
+      <div class="pharmacy-address"><%= pharmacy?.address || '123 Main Road' %></div>
+      <div class="pharmacy-license">
+        GSTIN: 29AAAAA0000A1Z5 &nbsp;|&nbsp; Drug Lic: KA-001234
+      </div>
+    </div>
+    <div class="line"></div>
+    <div class="bill-meta">
+      <table>
+        <tr>
+          <td><strong>Bill No:</strong> <%= sale.id %></td>
+          <td><strong>Date/Time:</strong> <%= new Date(sale.sale_date).toLocaleString('en-IN') %></td>
+        </tr>
+        <tr>
+          <td><strong>Patient:</strong> <%= sale.patient_name || '-' %></td>
+          <td><strong>Doctor:</strong> <%= sale.doctor_name || '-' %></td>
+        </tr>
+        <tr>
+          <td><strong>Mobile:</strong> <%= sale.patient_mobile || '-' %></td>
+          <td><strong>Address:</strong> <%= sale.patient_address || '-' %></td>
+        </tr>
+        <% if (sale.user_name) { %>
+        <tr>
+          <td><strong>Billed By:</strong> <%= sale.user_name %></td>
+          <td></td>
+        </tr>
+        <% } %>
+      </table>
+    </div>
+    <div class="line"></div>
+    <table class="items">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Drug Name</th>
+          <th>Batch</th>
+          <th>Expiry</th>
+          <th>Qty</th>
+          <th>Rate (₹)</th>
+          <th>Amount (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% let total=0; items.forEach(function(item, idx) { 
+            let amt = (item.qty || 0) * (item.price || 0);
+            total += amt; %>
+          <tr>
+            <td><%= idx+1 %></td>
+            <td class="left" style="text-align:left;"><%= item.drug_name || "(unknown)" %></td>
+            <td><%= item.batch_number || '' %></td>
+            <td><%= item.expiry ? item.expiry.slice(0,7) : '' %></td>
+            <td><%= item.qty %></td>
+            <td><%= (item.price||0).toFixed(2) %></td>
+            <td class="right"><%= amt.toFixed(2) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="6" class="right bold" style="font-size:1.17em;">Total (₹)</td>
+          <td class="right bold" style="font-size:1.18em;"><%= (sale.total_amount||total).toFixed(2) %></td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="pay-block">
+      <span class="pay-col"><span class="pay-label">Payment:</span> <span class="pay-value"><%= sale.payment_mode || '-' %></span></span>
+      <% if (sale.payment_reference) { %>
+        <span class="pay-col"><span class="pay-label">Txn/Ref:</span> <span class="pay-value"><%= sale.payment_reference %></span></span>
+      <% } %>
+      <% if (sale.amount_received) { %>
+        <span class="pay-col"><span class="pay-label">Received:</span> <span class="pay-value">₹<%= (+sale.amount_received).toFixed(2) %></span></span>
+      <% } %>
+      <% if (sale.change_returned && +sale.change_returned > 0) { %>
+        <span class="pay-col"><span class="pay-label">Change:</span> <span class="pay-value">₹<%= (+sale.change_returned).toFixed(2) %></span></span>
+      <% } %>
+    </div>
+    <div class="barcode-box">
+      <!-- Optional: Uncomment for barcode -->
+      <!-- <img src="https://barcode.tec-it.com/barcode.ashx?data=<%= sale.id %>&code=Code128&dpi=72" alt="Barcode" style="height:36px;"> -->
+    </div>
+    <div class="line"></div>
+    <div class="thank-banner">
+      Thank you for your trust!<br>
+      <span class="text-gray" style="font-weight: 500; font-size:.84em;">
+        (Please check all medicines, expiry, and returns before leaving.)
+      </span>
+    </div>
+    <div class="no-print print-buttons">
+      <button class="print-btn" onclick="window.print()">Print Bill</button>
+      <a href="/billing">New Bill</a>
+    </div>
+  </div>
+  <script>
+    window.onload = function() {
+      window.print();
+      window.onafterprint = function() {
+        window.location.href = '/billing';
+      };
+      setTimeout(function() {
+        window.location.href = '/billing';
+      }, 1800);
+    };
+  </script>
+</body>
+</html>

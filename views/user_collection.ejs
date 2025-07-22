@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>User Collection Report</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link href="https://fonts.googleapis.com/css?family=Inter:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(120deg, #e7f8f3 0%, #edf2fb 100%);
+      font-family: 'Inter', Arial, sans-serif;
+      margin:0; min-height:100vh;
+    }
+    .container {
+      max-width: 790px;
+      margin: 40px auto 25px auto;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 12px 28px rgba(39, 121, 255, 0.09), 0 2px 6px #eaf6fe;
+      padding: 32px 32px 20px 32px;
+      min-height: 67vh;
+    }
+    h2 {
+      color: #23a089;
+      text-align: center;
+      letter-spacing: 0.01em;
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-weight: 700;
+      font-size: 2rem;
+      display:flex; align-items:center; justify-content:center; gap:9px;
+    }
+    form {
+      display:flex; flex-wrap:wrap; gap:12px 18px; align-items: flex-end; margin-bottom:18px;
+      justify-content: flex-end;
+    }
+    form label { font-weight: 500; color: #4278ad; margin-right: 6px;}
+    input[type="date"] {
+      border: 1.5px solid #90d6b8;
+      border-radius: 6px;
+      padding: 7px 10px;
+      font-size: 1em;
+      color: #218078;
+      background: #eaf6f8;
+      margin-right: 10px;
+      box-shadow: 0 1px 7px #2dc4be21;
+      transition: border 0.22s;
+      font-family: inherit;
+    }
+    input[type="date"]:focus {
+      border: 1.7px solid #23a089;
+      outline: none;
+    }
+    .btn {
+      background: linear-gradient(90deg, #23a089 60%, #229cb8 99%);
+      color: #fff; font-weight: 600;
+      border: none;
+      padding: 9px 19px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      margin-right: 0;
+      box-shadow: 0 1.3px 7px #23a08923;
+      transition: background 0.17s, transform 0.12s;
+      text-decoration: none;
+      outline: none;
+      display:inline-block;
+    }
+    .btn:hover, .btn:focus {
+      background: linear-gradient(90deg, #22806b 60%, #228ea1 99%);
+      transform: translateY(-1.5px) scale(1.03);
+    }
+    table {
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: #fafdff;
+      border-radius: 13px;
+      overflow: hidden;
+      font-size: 1rem;
+      margin-top: 8px;
+      box-shadow:0 1.2px 7px #e3ecfa36;
+    }
+    th, td {
+      border: 0;
+      padding: 12px 6px;
+      text-align: center;
+      font-size: 1rem;
+    }
+    thead tr {
+      background: linear-gradient(90deg, #e7f7f1, #e0e8fb 90%);
+      color: #23a089;
+      font-size: 1rem;
+      border-bottom: 2px solid #bdd7ea;
+    }
+    th {
+      font-weight: 700;
+      letter-spacing: 0.018em;
+      font-size:1.06em;
+      position:sticky; top:0; z-index:2;
+    }
+    tbody tr {
+      transition: background 0.15s;
+    }
+    tbody tr:hover:not(.no-data) {
+      background: #e3faf5;
+    }
+    tr:nth-child(even) { background: #f7fbfa; }
+    td:last-child { text-align:right; font-weight:600; color:#189164;}
+    .no-data td {
+      color:#aeb2be;
+      background: #fcfcfe;
+      font-style: italic;
+      text-align:center;
+      font-size:1.08em;
+      padding:21px 0;
+    }
+    @media (max-width: 700px) {
+      .container {padding: 2vw 2vw;}
+      table, th, td { font-size:0.97rem;}
+      h2 { font-size: 1.24rem;}
+      .btn { font-size:0.98em; padding:7px 13px;}
+    }
+    @media (max-width: 500px) {
+      .container {padding:2vw 1vw;}
+      th, td { font-size:0.94rem; padding:7px 2px;}
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>
+    <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+      <circle cx="20" cy="20" r="20" fill="#e1f3ee"/>
+      <rect x="11" y="16" width="18" height="8" rx="4" fill="#23a089"/>
+      <rect x="17.1" y="10.7" width="6" height="18.6" rx="3" transform="rotate(45 20 20)" fill="#71cbfa"/>
+    </svg>
+    User Collection Report
+  </h2>
+  <form method="get">
+    <label for="from">From:</label>
+    <input type="date" id="from" name="from" value="<%= from %>">
+    <label for="to">To:</label>
+    <input type="date" id="to" name="to" value="<%= to %>">
+    <button type="submit" class="btn">Go</button>
+    <a class="btn" href="/dashboard">Dashboard</a>
+  </form>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>User</th>
+        <th>Bills</th>
+        <th>Total Collected (₹)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% if (collections.length === 0) { %>
+        <tr class="no-data"><td colspan="4">No collections found.</td></tr>
+      <% } else { %>
+        <% collections.forEach(function(c){ %>
+          <tr>
+            <td><%= c.date %></td>
+            <td><%= c.user_name %></td>
+            <td><%= c.bill_count %></td>
+            <td><%= (c.total_amount || 0).toFixed(2) %></td>
+          </tr>
+        <% }) %>
+      <% } %>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>

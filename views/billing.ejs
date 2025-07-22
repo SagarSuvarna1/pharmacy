@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medical Billing - Pharmacy POS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="/public/css/style.css">
+  <style>
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    background: #f4f7fb;
+    color: #1a2a4e;
+  }
+
+  .container {
+    max-width: 100%;
+    margin: 0;
+    padding: 40px 20px 80px;
+    background: #ffffff;
+  }
+
+  h2 {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 16px;
+    color: #1c3c70;
+  }
+
+  a {
+    text-decoration: none;
+    color: #2b6cb0;
+    font-size: 15px;
+    display: inline-block;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 32px 0 14px;
+    color: #204a8f;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 4px;
+  }
+
+  label {
+    font-weight: 500;
+    font-size: 15px;
+    margin-bottom: 4px;
+    display: inline-block;
+    color: #2a4365;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    padding: 10px 12px;
+    border: 1px solid #cbd5e0;
+    border-radius: 6px;
+    font-size: 15px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #f9fafb;
+    color: #2d3748;
+    transition: border 0.2s ease;
+  }
+
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  select:focus {
+    border-color: #3182ce;
+    outline: none;
+    background-color: #ffffff;
+  }
+
+  input[readonly] {
+    background-color: #edf2f7;
+    color: #718096;
+  }
+
+  .bill-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 18px;
+    font-size: 14px;
+  }
+
+  .bill-table th,
+  .bill-table td {
+    border: 1px solid #d2d6dc;
+    padding: 10px 6px;
+    text-align: center;
+  }
+
+  .bill-table th {
+    background: #e8f1fc;
+    color: #1a365d;
+    font-weight: 600;
+  }
+
+  .add-row,
+  .remove-row {
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .add-row {
+    color: #38a169;
+  }
+
+  .remove-row {
+    color: #e53e3e;
+  }
+
+  .btn {
+    background: #2b6cb0;
+    color: #fff;
+    border: none;
+    padding: 12px 26px;
+    font-size: 16px;
+    border-radius: 6px;
+    margin-top: 30px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+
+  .btn:hover {
+    background: #2c5282;
+  }
+
+  .btn:disabled {
+    background: #a0aec0;
+    cursor: not-allowed;
+  }
+
+  .success {
+    color: #2f855a;
+    background: #f0fff4;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid #c6f6d5;
+  }
+
+  .error {
+    color: #c53030;
+    background: #fff5f5;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    border: 1px solid #feb2b2;
+  }
+
+  .payment-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    margin-top: 10px;
+  }
+
+  .pay-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+    flex: 1;
+  }
+
+  .pay-note {
+    font-size: 14px;
+    color: #4a5568;
+    margin-top: 6px;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  @media (max-width: 768px) {
+    .bill-table th,
+    .bill-table td {
+      font-size: 13px;
+      padding: 8px 4px;
+    }
+
+    h2 {
+      font-size: 22px;
+    }
+
+    .section-title {
+      font-size: 17px;
+    }
+
+    .btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .payment-row {
+      flex-direction: column;
+    }
+  }
+</style>
+
+</head>
+<body>
+  <div class="container">
+    <h2>Medical Billing</h2>
+    <a href="/dashboard">← Back to Dashboard</a>
+    <% if (typeof message !== "undefined" && message) { %>
+      <div class="<%= message.success ? 'success' : 'error' %>"><%= message.text %></div>
+    <% } %>
+
+    <form method="POST" action="/billing" id="billForm" autocomplete="off">
+      <div class="section-title">Patient and Bill Info</div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px 24px;margin-bottom: 13px;">
+        <div>
+          <label>Patient Name:</label><br>
+          <input type="text" name="patient_name" required>
+        </div>
+        <div>
+          <label>Mobile:</label><br>
+          <input type="text" name="patient_mobile" maxlength="12" pattern="[0-9]*">
+        </div>
+        <div>
+          <label>Address:</label><br>
+          <input type="text" name="patient_address" style="width:220px;">
+        </div>
+		
+        <div>
+          <label>Doctor:</label><br>
+          <input type="text" name="doctor_name">
+        </div>
+      </div>
+
+      <div class="section-title">Drugs</div>
+      <div class="table-responsive">
+        <table class="bill-table" id="drugsTable">
+          <thead>
+            <tr>
+              <th>Drug</th>
+              <th>Batch</th>
+              <th>Expiry</th>
+              <th>MRP</th>
+              <th>Stock</th>
+              <th>Qty</th>
+              <th>Sale Price</th>
+              <th>Total</th>
+              <th><span class="add-row" onclick="addRow()">＋</span></th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr>
+              <td>
+                <select name="drugs[0][drug_id]" onchange="fetchBatches(this, 0)">
+                  <option value="">Select</option>
+                  <% drugs.forEach(function(drug){ %>
+                    <option value="<%= drug.id %>"><%= drug.name %> (<%= drug.code %>)</option>
+                  <% }) %>
+                </select>
+              </td>
+              <td><select name="drugs[0][batch_id]" onchange="batchChanged(this, 0)"><option value="">-</option></select></td>
+              <td><input type="text" name="drugs[0][expiry]" readonly style="width:64px;"></td>
+              <td><input type="text" name="drugs[0][mrp]" readonly style="width:56px;"></td>
+              <td><input type="text" name="drugs[0][stock]" readonly style="width:44px;"></td>
+              <td><input type="number" name="drugs[0][qty]" min="1" value="1" onchange="calcRow(0)"></td>
+              <td><input type="number" name="drugs[0][sale_price]" min="0" step="0.01" onchange="calcRow(0)"></td>
+              <td><input type="text" name="drugs[0][line_total]" readonly style="width:65px;"></td>
+              <td><span class="remove-row" onclick="removeRow(this)">✖</span></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="7" style="text-align:right;">Total Bill:</th>
+              <th id="grand_total">0.00</th>
+              <th></th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Payment Section -->
+      <div class="section-title">Payment</div>
+      <div class="payment-row">
+        <div class="pay-group">
+          <label for="payment_mode">Payment Mode</label>
+          <select name="payment_mode" id="payment_mode" required onchange="paymentModeChanged()">
+            <option value="">Select...</option>
+            <option value="Cash">Cash</option>
+            <option value="Card">Card</option>
+            <option value="UPI">UPI</option>
+            <option value="NetBanking">Net Banking</option>
+            <option value="Wallet">Wallet</option>
+            <option value="Credit">Credit (Due)</option>
+          </select>
+        </div>
+        <div class="pay-group" id="amountReceivedGroup" style="display:none;">
+          <label for="amount_received">Amount Received</label>
+          <input type="number" min="0" step="0.01" name="amount_received" id="amount_received" class="pay-ref" placeholder="e.g. 500.00" onchange="calcChange()">
+          <span class="pay-note" id="changeNote" style="display:none;">Change to return: ₹<span id="change_to_return"></span></span>
+        </div>
+        <div class="pay-group" id="txnGroup" style="display:none;">
+          <label for="payment_reference" id="refLabel">Txn / Ref. No.</label>
+          <input type="text" name="payment_reference" id="payment_reference" class="pay-ref" maxlength="28" placeholder="Transaction/UPI Ref">
+        </div>
+      </div>
+
+      <button class="btn" type="submit" id="submitBtn">Save & Print Bill</button>
+    </form>
+  </div>
+
+  <script>
+    // Pass server variables to JS
+    window.batchesByDrug = <%- JSON.stringify(batchesByDrug || {}) %>;
+    window.drugList = <%- JSON.stringify(drugs) %>;
+
+    function addRow() {
+      const tbody = document.getElementById('tableBody');
+      const idx = tbody.rows.length;
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>
+          <select name="drugs[${idx}][drug_id]" onchange="fetchBatches(this, ${idx})">
+            <option value="">Select</option>
+            ${window.drugList.map(d => `<option value="${d.id}">${d.name} (${d.code})</option>`).join('')}
+          </select>
+        </td>
+        <td><select name="drugs[${idx}][batch_id]" onchange="batchChanged(this, ${idx})"><option value="">-</option></select></td>
+        <td><input type="text" name="drugs[${idx}][expiry]" readonly style="width:64px;"></td>
+        <td><input type="text" name="drugs[${idx}][mrp]" readonly style="width:56px;"></td>
+        <td><input type="text" name="drugs[${idx}][stock]" readonly style="width:44px;"></td>
+        <td><input type="number" name="drugs[${idx}][qty]" min="1" value="1" onchange="calcRow(${idx})"></td>
+        <td><input type="number" name="drugs[${idx}][sale_price]" min="0" step="0.01" onchange="calcRow(${idx})"></td>
+        <td><input type="text" name="drugs[${idx}][line_total]" readonly style="width:65px;"></td>
+        <td><span class="remove-row" onclick="removeRow(this)">✖</span></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    function removeRow(el) {
+      const tbody = document.getElementById('tableBody');
+      if (tbody.rows.length > 1) {
+        el.closest('tr').remove();
+        updateGrand();
+      }
+    }
+
+    function fetchBatches(sel, idx) {
+      const drugId = sel.value;
+      const batchSel = document.getElementsByName(`drugs[${idx}][batch_id]`)[0];
+      batchSel.innerHTML = '<option value="">-</option>';
+      if (!window.batchesByDrug[drugId]) return;
+      window.batchesByDrug[drugId].forEach(b => {
+        batchSel.innerHTML += `<option value="${b.id}"
+          data-expiry="${b.expiry || ''}"
+          data-mrp="${b.mrp || ''}"
+          data-sale="${b.sale_price || ''}"
+          data-stock="${b.current_stock || ''}">
+          ${b.batch_number} (Exp ${b.expiry}, Stock ${b.current_stock})
+        </option>`;
+      });
+      ['expiry','mrp','sale_price','stock','qty','line_total'].forEach(n => {
+        const f = document.getElementsByName(`drugs[${idx}][${n}]`)[0];
+        if (f) f.value = '';
+      });
+      updateGrand();
+    }
+
+    function batchChanged(batchSel, idx) {
+      const opt = batchSel.selectedOptions[0];
+      if (!opt || opt.value === "") return;
+      document.getElementsByName(`drugs[${idx}][expiry]`)[0].value = opt.dataset.expiry || "";
+      document.getElementsByName(`drugs[${idx}][mrp]`)[0].value = opt.dataset.mrp || "";
+      document.getElementsByName(`drugs[${idx}][stock]`)[0].value = opt.dataset.stock || "";
+      document.getElementsByName(`drugs[${idx}][sale_price]`)[0].value = opt.dataset.sale || "";
+      document.getElementsByName(`drugs[${idx}][qty]`)[0].value = 1;
+      calcRow(idx);
+    }
+
+    function calcRow(idx) {
+      const qty = +document.getElementsByName(`drugs[${idx}][qty]`)[0].value;
+      const price = +document.getElementsByName(`drugs[${idx}][sale_price]`)[0].value;
+      const total = (!isNaN(qty) && !isNaN(price)) ? (qty * price).toFixed(2) : '';
+      document.getElementsByName(`drugs[${idx}][line_total]`)[0].value = total;
+      updateGrand();
+    }
+
+    function updateGrand() {
+      let total = 0;
+      document.querySelectorAll('input[name$="[line_total]"]').forEach(f => {
+        total += parseFloat(f.value) || 0;
+      });
+      document.getElementById('grand_total').innerText = total.toFixed(2);
+      calcChange(); // update change, if needed
+    }
+
+    // PAYMENT SECTION LOGIC
+    function paymentModeChanged() {
+      const mode = document.getElementById('payment_mode').value;
+      document.getElementById('txnGroup').style.display = (mode === 'Card' || mode === 'UPI' || mode === 'NetBanking' || mode === 'Wallet') ? 'flex' : 'none';
+      document.getElementById('amountReceivedGroup').style.display = (mode === 'Cash') ? 'flex' : 'none';  
+      document.getElementById('changeNote').style.display = 'none';
+      if (mode !== 'Cash') {
+        document.getElementById('amount_received').value = '';
+        document.getElementById('change_to_return').innerText = '';
+      }
+      // Optionally, show/hide field labels differently for UPI, Card, etc.
+      let label = 'Txn / Ref. No.';
+      if(mode==='UPI') label='UPI Ref. No.';
+      if(mode==='Card') label='Txn/Last 4 digits';
+      if(mode==='Wallet') label='Wallet Ref./No.';
+      document.getElementById('refLabel').innerText = label;
+    }
+    function calcChange() {
+      const mode = document.getElementById('payment_mode').value;
+      if (mode !== 'Cash') {
+        document.getElementById('changeNote').style.display = 'none';
+        return;
+      }
+      const amtRcv = parseFloat(document.getElementById('amount_received').value) || 0;
+      const gtot = parseFloat(document.getElementById('grand_total').innerText) || 0;
+      const change = amtRcv - gtot;
+      if (amtRcv > 0 && change >= 0) {
+        document.getElementById('changeNote').style.display = '';
+        document.getElementById('change_to_return').innerText = change.toFixed(2);
+      } else {
+        document.getElementById('changeNote').style.display = 'none';
+        document.getElementById('change_to_return').innerText = '';
+      }
+    }
+
+    document.getElementById('billForm').onsubmit = function () {
+      // Check at least one drug row is non-empty
+      let valid = false;
+      document.querySelectorAll('select[name$="[drug_id]"]').forEach(sel => {
+        if (sel.value) valid = true;
+      });
+      if (!valid) {
+        alert("Please add at least one drug!");
+        return false;
+      }
+      // Check payment mode
+      const pmode = document.getElementById('payment_mode').value;
+      if (!pmode) {
+        alert('Please select a payment mode!');
+        return false;
+      }
+      // If cash: check amount received
+      if (pmode==='Cash') {
+        const amtrcv = parseFloat(document.getElementById('amount_received').value) || 0;
+        const gtot = parseFloat(document.getElementById('grand_total').innerText) || 0;
+        if (amtrcv < gtot) {
+          alert('Amount received is less than total bill!');
+          return false;
+        }
+      }
+      // If Card/UPI/Wallet/NetBanking: check ref number
+      if (['Card','UPI','Wallet','NetBanking'].includes(pmode)) {
+        if (!document.getElementById('payment_reference').value.trim()) {
+          alert('Please enter transaction/reference number!');
+          return false;
+        }
+      }
+      document.getElementById('submitBtn').disabled = true;
+      return true;
+    };
+
+    // Re-calculate total on load
+    updateGrand();
+  </script>
+</body>
+</html>
